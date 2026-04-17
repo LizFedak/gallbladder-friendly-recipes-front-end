@@ -69,17 +69,17 @@ function getTotalTime(prepTime?: number, cookTime?: number) {
   return (prepTime || 0) + (cookTime || 0);
 }
 
-
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: { q?: string; tag?: string };
+  searchParams?: Promise<{ q?: string; tag?: string }>;
 }) {
-  const params = searchParams ?? {};
+  const params = (await searchParams) ?? {};
+
   const recipes = await client.fetch<Recipe[]>(RECIPES_QUERY, {}, options);
 
-  const q = (params.q || "").trim().toLowerCase();
-  const selectedTag = (params.tag || "").trim().toLowerCase();
+  const q = (params.q ?? "").trim().toLowerCase();
+  const selectedTag = (params.tag ?? "").trim().toLowerCase();
 
   const allTags = Array.from(
     new Set(recipes.flatMap((recipe) => recipe.dietTags || []).filter(Boolean))
